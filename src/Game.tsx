@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { json } from "stream/consumers";
 import Square from "./Components/Square";
 
 interface ScoreType {
@@ -29,6 +28,16 @@ const Game = (): JSX.Element => {
   const [currentPlayer, setCurrentPlayer] = useState("X");
   // 스코어판 상태
   const [scores, setScores] = useState(initialScores);
+
+  useEffect(() => {
+    // 로컬스토리지에 있는 string으로 담긴 스코어 객체를 storedScores 변수에 저장
+    const storedScores = localStorage.getItem("scores");
+
+    // scores이름의 로컬스토리지가 존재하면 객체 형식으로 바꿔 setScore 해준다.
+    if (storedScores) {
+      setScores(JSON.parse(storedScores));
+    }
+  }, []);
 
   useEffect(() => {
     // 게임판 상태가 바뀌면 선수 변경
@@ -93,6 +102,7 @@ const Game = (): JSX.Element => {
     setGameState(initialGameState);
   };
 
+  // 스코어판 리셋 함수
   const resetScore = () => {
     setScores(initialScores);
     localStorage.clear();
@@ -117,6 +127,8 @@ const Game = (): JSX.Element => {
     historyState[cellIndex] = currentPlayer;
     // 게임판 상태를 게임판 기록 배열의 상태로 업데이트
     setGameState(historyState);
+
+    // changePlayer();
   };
 
   return (
@@ -136,8 +148,8 @@ const Game = (): JSX.Element => {
         </div>
 
         <div className="mx-auto w-3/5 text-xl italic text-white">
-          <div className="mt-5 md:flex-row flex flex-col">
-            <p className="basis-3/5 mr-5 md:self-center font-semibold">
+          <div className="mt-5 flex flex-col lg:flex-row">
+            <p className="basis-3/5 mr-5 font-semibold">
               Next Player:
               <span
                 className={`${
@@ -147,6 +159,20 @@ const Game = (): JSX.Element => {
                 {currentPlayer}
               </span>
             </p>
+            <div className="basis-2/5 flex justify-between">
+              <button
+                onClick={resetScore}
+                className="border-white mr-5 w-[150px] border-2 rounded px-2"
+              >
+                reset scores
+              </button>
+              <button
+                onClick={resetBoard}
+                className="border-white w-[150px] border-2 rounded px-2"
+              >
+                reset game
+              </button>
+            </div>
           </div>
           <p className="mt-5 mr-5">
             Player <span className="font-lobster text-yellow-300 mr-1">O</span>{" "}
